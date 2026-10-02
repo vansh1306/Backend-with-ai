@@ -1,0 +1,22 @@
+<input id="q" value="Explain Kafka consumer groups simply" size="50" />
+<button onclick="ask()">Ask</button>
+<p id="out" style="white-space: pre-wrap"></p>
+
+<script>
+  function ask() {
+    const out = document.getElementById("out");
+    out.textContent = "";
+
+    const q = encodeURIComponent(document.getElementById("q").value);
+    const source = new EventSource("/stream?q=" + q);
+
+    source.onmessage = (e) => (out.textContent += JSON.parse(e.data));
+
+    source.addEventListener("done", () => source.close());
+    source.addEventListener("failed", (e) => {
+      out.textContent += "\n[error] " + JSON.parse(e.data);
+      source.close();
+    });
+    source.onerror = () => source.close();
+  }
+</script>
