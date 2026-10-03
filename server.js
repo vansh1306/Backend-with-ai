@@ -43,15 +43,15 @@
 //     console.log("server has been started on port 3000....");
 // });
 
-const express= require("express");
+const express=require("express");
 const {ai,MODEL}=require("./lib/gemini");
-const { tr } = require("zod/v4/locales");
 
 const app=express();
 app.use(express.static("public"));
 
 app.get("/stream",async(req,res)=>{
     const question= req.query.q;
+
     if(!question)
     {
         return res.status(400).json({
@@ -60,7 +60,7 @@ app.get("/stream",async(req,res)=>{
     }
 
     res.setHeader("Content-Type","text/event-stream");
-    res.setHeader("Cache-Control","no-cahce");
+    res.setHeader("Cache-Control","no-control");
     res.flushHeaders();
 
     try {
@@ -69,7 +69,7 @@ app.get("/stream",async(req,res)=>{
             model:MODEL,
             stream:true
         });
-        for await(const result of stream)
+        for await (const result of stream)
         {
             if(result.event_type==="step.delta" && result.delta.type==="text")
             {
@@ -87,3 +87,4 @@ app.get("/stream",async(req,res)=>{
 app.listen(3000,()=>{
     console.log("server has been started on port 3000...");
 });
+
